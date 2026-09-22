@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tata Sons Private Limited - Employee Count</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    :root {
+      --navy: #032235;
+      --ink: #132334;
+      --muted: #78838e;
+      --line: #d9dde1;
+      --soft: #f6f7f8;
+      --blue: #4449bb;
+      --green: #087b1c;
+      --red: #ef1119;
+      --sidebar: 248px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: #fff; font: 13px/1.5 "Open Sans", Arial, sans-serif; overflow: hidden; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { height: 56px; display: flex; align-items: center; gap: 24px; padding: 0 12px; color: #fff; background: var(--navy); position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 0 rgba(0,0,0,.15); }
+    .brand { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; letter-spacing: -2px; }
+    .brand sub { position: relative; top: 7px; left: -5px; font-size: 11px; letter-spacing: 0; }
+    .topnav { display: flex; gap: 26px; align-items: center; white-space: nowrap; }
+    .topnav button, .top-actions button { color: #fff; border: 0; background: transparent; padding: 5px 0; }
+    .topnav button::after { content: "⌄"; padding-left: 7px; opacity: .9; }
+    .topnav button:nth-child(1)::after, .topnav button:nth-child(4)::after { content: ""; padding: 0; }
+    .top-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+    .search { height: 44px; width: min(630px, 45vw); display: flex; color: #9aa0a6; background: #fff; border-radius: 3px; overflow: hidden; }
+    .search select { border: 0; border-right: 1px solid #e3e4e6; padding: 0 12px; color: #48515b; background: #f7f7f7; }
+    .search input { flex: 1; min-width: 0; border: 0; outline: 0; padding: 0 13px; color: #3a4652; }
+    .search input::placeholder { color: #b1b5b9; }
+    .profile { width: 30px; height: 30px; border: 0; border-radius: 50%; color: #fff; background: #23465a; }
+    .actionbar { height: 56px; padding: 0; border-bottom: 1px solid var(--line); background: #fff; }
+    .actionbar button { height: 36px; padding: 0 12px; border: 1px solid #d8dce0; background: #fff; color: #24313c; }
+    .actionbar button::after { content: "⌄"; padding-left: 11px; }
+    .layout { display: flex; height: calc(100vh - 112px); overflow: hidden; }
+    .sidebar { width: var(--sidebar); flex: 0 0 var(--sidebar); border-right: 1px solid #ccd1d5; background: #fafafa; padding: 16px 0 40px; }
+    .sidebar-search { height: 36px; display: flex; align-items: center; gap: 8px; margin: 0 12px 14px; padding: 0 10px; border: 1px solid #d4d8dc; border-radius: 3px; color: #8d969d; background: #fff; }
+    .sidebar-search input { width: 100%; border: 0; outline: 0; color: var(--ink); }
+    .sidebar h4 { margin: 12px 12px 8px; font-size: 12px; letter-spacing: .2px; }
+    .side-item { padding: 6px 12px; color: #202d38; }
+    .side-item.indent { padding-left: 26px; }
+    .side-item.muted { color: #7f878d; font-size: 11px; padding-top: 0; }
+    .side-item.active { margin-top: 4px; border-left: 3px solid #152e3f; padding-left: 9px; font-weight: 700; background: #eef0f2; }
+    .side-section { margin-top: 12px; }
+    .side-row { display: flex; justify-content: space-between; align-items: center; padding-right: 12px; }
+    .side-row .refresh { font-size: 19px; color: #27333d; }
+    main { min-width: 0; flex: 1; padding: 14px 5px 48px 19px; overflow: auto; }
+    .crumb { height: 38px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); font-size: 12px; }
+    .crumb a { color: #23313d; text-decoration: none; }
+    .crumb a::before { content: "←"; padding-right: 8px; font-size: 17px; }
+    .crumb h1 { margin: 0; padding-left: 12px; border-left: 1px solid #d3d7da; font-size: 17px; }
+    .content { padding-top: 35px; animation: rise .55s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .eyebrow { margin: 0 0 14px; font-size: 12px; font-weight: 500; }
+    #chart { height: 405px; width: 100%; }
+    .table-heading { margin: 12px 0 10px; }
+    .table-heading h2 { margin: 0 0 8px; font-size: 13px; }
+    .table-heading p { margin: 0; color: #92999e; font-size: 12px; }
+    .table-heading h3 { margin: 0; color: #92999e; font-size: 12px; font-weight: 400; }
+    .table-wrap { overflow-x: auto; border: 1px solid #d9dde0; scrollbar-color: #aeb5ba #f0f1f2; }
+    table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
+    th, td { min-width: 101px; height: auto; padding: 10px 12px; border-right: 1px solid #d9dde0; border-bottom: 1px solid #d9dde0; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { width: 220px; max-width: 220px; min-width: 220px; text-align: left; position: sticky; left: 0; z-index: 2; background: inherit; }
+    thead th { font-weight: 700; background: #f7f8f8; }
+    tbody tr:last-child td { padding-bottom: 9px; }
+    tbody tr:hover td { background: #f3f6f8; }
+    tbody tr:hover td:first-child { background: #f3f6f8; }
+    .subsection { margin-top: 13px; }
+    .subsection h2 { margin: 0 0 12px; font-size: 13px; font-weight: 500; }
+    .establishment-block { margin-top: 0; padding-top: 6px; border-top: 1px solid var(--line); }
+    .establishment-block h3 { margin: 0 0 10px; font-size: 13px; line-height: 18px; font-weight: 600; color: #273540; }
+    .establishment-block td:first-child { white-space: normal; line-height: 18px; }
+    .establishment-block .table-wrap { margin-bottom: 0; }
+    .notes { margin-top: 30px; padding: 0 0 32px; border-top: 1px solid #d9dde0; }
+    .notes h2 { margin: 14px 0 4px; padding-bottom: 4px; color: #7e8893; font-size: 12px; line-height: 18px; font-weight: 400; }
+    .notes ol { margin: 0; padding-left: 18px; color: #001828; font-size: 12px; line-height: 18px; font-weight: 500; }
+    .chart-note { display: inline-flex; margin-top: 12px; padding: 6px 10px; border: 1px solid #e2e5e7; color: #75808a; background: #fafafa; }
+    .chat { position: fixed; right: 20px; bottom: 18px; z-index: 30; width: 49px; height: 49px; border: 0; border-radius: 50%; color: #fff; background: var(--navy); box-shadow: 0 5px 17px rgba(0,0,0,.22); font-size: 20px; transition: transform .2s ease; }
+    .chat:hover { transform: translateY(-3px); }
+    @media (max-width: 900px) {
+      .topnav { gap: 12px; }
+      .topnav button:nth-child(n+3) { display: none; }
+      .search { width: 36vw; }
+      .sidebar { width: 210px; flex-basis: 210px; }
+    }
+    @media (max-width: 680px) {
+      .topbar { gap: 10px; }
+      .topnav { display: none; }
+      .search { width: 100%; }
+      .top-actions { width: calc(100% - 44px); gap: 8px; }
+      .top-actions > button:not(.profile) { display: none; }
+      .sidebar { display: none; }
+      main { padding: 12px; }
+      #chart { height: 330px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">p<sub>c</sub></div>
+    <nav class="topnav" aria-label="Primary navigation">
+      <button>Dashboard</button><button>Companies</button><button>Investors</button><button>Transactions</button><button>More</button>
+    </nav>
+    <div class="top-actions">
+      <label class="search"><select aria-label="Search scope"><option>Profiled Companies</option></select><input placeholder="Search. Use '&' or '|' to combine multiple terms" aria-label="Search"></label>
+      <button title="Insights">✧</button><button title="Refresh">↻</button><button title="Notifications">♧</button><button class="profile">S⌄</button>
+    </div>
+  </header>
+  <div class="actionbar"><button>Actions</button></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <label class="sidebar-search">⌕ <input placeholder="Search"></label>
+      <h4>BASIC PROFILE</h4>
+      <div class="side-item">Overview　⌃</div><div class="side-item indent">Overview</div><div class="side-item muted indent">Last Update: 19 Sep 2026　　　　　　　　　↻</div>
+      <div class="side-item indent">Associated Companies</div>
+      <div class="side-section"><div class="side-row"><div class="side-item">Financials　⌃</div><span class="refresh">↻</span></div><div class="side-item muted">Last MCA Update:<br>04 May 2026</div></div>
+      <div class="side-item indent">Income Statement</div><div class="side-item indent">Balance Sheet</div><div class="side-item indent">Cash Flow</div><div class="side-item indent">Download Filings</div><div class="side-item indent">Basic Financial Ratios</div><div class="side-item indent">Deals</div>
+      <div class="side-section"><div class="side-row"><div class="side-item">Directors</div><span class="refresh">↻</span></div><div class="side-item muted">Last Update: 08 Sep 2026</div></div>
+      <div class="side-item">Cross Directorship</div><div class="side-item muted">Last Update: 08 Sep 2026　　　　　　　　　↻</div><div class="side-item">News</div><div class="side-item">SBO</div><div class="side-item">Key People</div><div class="side-item">Products &amp; Services</div>
+      <div class="side-item active">Employee Count</div><div class="side-item muted">Last Update: 25 Aug 2025　　　　　　　　　↻</div>
+      <div class="side-section"><div class="side-item">Peers　⌃</div><div class="side-item indent">Competitors</div><div class="side-item indent">Listed Comparables</div></div>
+    </aside>
+    <main>
+      <div class="crumb"><a href="#">Back to overview</a><h1>Employee Count</h1></div>
+      <section class="content">
+        <h3 class="eyebrow">Overall Employee Count - Including Subsidiary</h3>
+        <div id="chart" aria-label="Employee count chart"></div>
+        <div class="table-heading"><h3>Total Employee Count</h3><h3>Total employees across the company and all its subsidiaries.</h3></div>
+        <div class="table-wrap" id="employee-table"></div>
+        <section class="subsection" aria-labelledby="establishment-heading">
+          <div class="table-heading"><h3 id="establishment-heading">Subsidiary</h3></div>
+          <div id="establishment-tables"></div>
+        </section>
+        <section class="notes" aria-label="Notes">
+          <h2>Notes</h2>
+          <ol>
+            <li>Employee count calculated in this panel pertains to the employee counts of the associated companies that are registered in India. This count does not include employee count in foreign associated companies/subsidiaries.</li>
+            <li>Unable to calculate the data from September 2025 since data is not available from EPFO !</li>
+          </ol>
+        </section>
+      </section>
+    </main>
+  </div>
+  <button class="chat" aria-label="Open support chat">▰</button>
+  <script>
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [];
+    for (let year = 2016, month = 2; year < 2026 || (year === 2026 && month <= 5); ) {
+      months.push(`${monthNames[month]} ${year}`);
+      month++;
+      if (month === 12) { month = 0; year++; }
+    }
+    const employeeCount = '1056,1299,1023,1251,1481,1648,1905,2190,3396,415942,408372,411865,418434,415701,417129,417117,415168,424273,419001,416963,425846,421160,424593,424368,425795,428791,429879,436144,441133,446694,452738,455016,455855,458383,456917,468484,470355,467391,468042,475931,487504,495634,498159,492536,492313,493006,492706,496450,492580,480773,475332,471927,476043,480915,491566,501072,505643,507824,517795,524822,527366,533876,539413,557237,563454,583344,583930,584913,589687,614114,627249,637564,652716,644500,659965,666572,678305,684716,634105,683412,680619,675230,675644,682424,682237,678871,680564,686765,681161,672135,654678,655187,654451,652903,665388,676922,673868,677721,702363,705191,712070,717601,721293,726347,724250,731245,731704,716878,731152,735697,742075,772986,769068,764632,704147,688485,680755,676161,675006,642232,672672,668839,673530,28'.split(',').map(Number);
+    const joined = '75,257,67,245,262,197,283,337,1253,411,863,13,512,15,131,16,711,10,779,12,301,13,087,15,518,18,067,9,862,9,202,17,649,7,947,12,082,10,287,14,009,15,849,12,473,17,585,19,425,18,379,20,257,16,925,15,893,20,894,22,598,25,796,17,244,14,372,16,424,21,094,26,405,22,063,21,178,14,728,19,821,16,985,15,487,17,715,9,712,5,827,4,988,8,677,12,563,13,667,21,077,17,936,16,646,16,641,18,935,20,321,18,249,21,770,19,685,36,115,24,151,35,710,22,202,23,961,23,061,42,114,32,278,30,783,34,170,23,623,36,541,26,932,29,319,27,961,22,951,73,275,19,791,17,422,16,575,19,043,15,584,14,238,17,771,18,707,20,755,12,693,12,576,11,713,10,429,9,006,18,605,17,257,6,231,10,812,31,842,14,326,18,185,19,201,19,635,14,446,17,234,15,212,13,423,13,148,12,076,19,632,22,542,17,303,4,948,4,691,0,0,0,0,0,0,0,0,0'.split(',').map(Number);
+    const attrition = '271,14,343,17,30,30,26,52,46,121082,11,638,10,141,13,512,9,842,13,099,17,466,8,962,15,134,11,240,8,766,12,633,8,645,10,512,12,582,12,829,11,385,11,315,14,436,12,818,14,213,14,647,15,054,18,366,24,064,14,229,15,373,17,334,15,773,13,205,14,832,13,933,18,653,20,351,20,044,16,292,15,459,13,971,13,582,17,634,10,429,12,082,8,447,8,795,10,426,8,430,12,075,14,460,8,964,13,294,15,705,15,260,14,148,18,291,17,933,15,820,21,616,22,978,18,287,17,687,18,872,20,468,19,147,23,025,20,700,20,325,17,586,21,550,73,562,23,968,22,774,22,811,16,121,12,264,15,780,17,611,15,757,15,434,26,359,21,719,30,033,11,203,11,156,10,554,6,131,5,723,9,080,6,958,7,200,11,498,11,306,13,670,15,943,12,111,19,197,13,702,12,950,23,807,13,774,15,087,12,580,12,680,8,868,9,125,53,053,0,0,0,0,0,0,0,0,0'.split(',').map(Number);
+    const mergeThousands = (values, initialValues) => { const merged = values.slice(0, initialValues); for (let i = initialValues; i < values.length;) { if (values[i] === 0 && values.slice(i).every(value => value === 0)) { merged.push(...values.slice(i)); break; } if (i + 1 < values.length && values[i] < 1000 && values[i + 1] < 1000) { merged.push(values[i] * 1000 + values[i + 1]); i += 2; } else { merged.push(values[i++]); } } while (merged.length < months.length) merged.push(0); return merged.slice(0, months.length); };
+    const employeeSeries = mergeThousands(employeeCount, 9);
+    const joinedSeries = mergeThousands(joined, 8);
+    const attritionSeries = mergeThousands(attrition, 9);
+    const format = value => value.toLocaleString('en-US');
+    const makeTable = (target, rows) => {
+      const table = document.createElement('table');
+      table.innerHTML = `<thead><tr><th>Type</th>${months.map(month => `<th>${month}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr><td>${row.name}</td>${row.values.map(value => `<td>${format(value)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      document.querySelector(target).appendChild(table);
+    };
+    makeTable('#employee-table', [
+      { name: 'Employee Count', values: employeeSeries },
+      { name: 'Employees Joined', values: joinedSeries },
+      { name: 'Attrition', values: attritionSeries }
+    ]);
+    const subsidiaryNames = ['Tata Projects Limited','Tata Teleservices Limited','Aptonline Limited','Tata Lockheed Martin Aerostructures Limited','Tata Sikorsky Aerospace Limited','Indian Rotorcraft Limited','Tata Boeing Aerospace Limited','TACO Prestolite Electric Private Limited','Tq Cert Services Private Limited','Tpl Services Private Limited','Tata Elxsi Limited','Tejas Networks Limited','Tata Semiconductor Assembly And Test Private Limited','Tril Bengaluru Real Estate Five Limited','Tril Bengaluru Real Estate Six Limited','Durg Shivnath Expressways Private Limited','Tata Advanced Systems Limited','Nova Integrated Systems Limited','Tata 1Mg Healthcare Solutions Private Limited','Air India Limited','Tata Tele Nxtgen Solutions Limited','Ai Fleet Services Ifsc Limited','TCS E-Serve International Limited','Tata 1mg Technologies Private Limited','LFS Healthcare Private Limited','Tata Consultancy Services Limited','Air India Express Limited','C-Edge Technologies Limited','Tata Classedge Limited','Stryder Cycle Private Limited','Tata International Limited','Tata Consulting Engineers Limited','Artson Limited','Tata Communications Limited','Tata Asset Management Private Limited','Tata Teleservices (Maharashtra) Limited','Tata Securities Limited','Tata Aia Life Insurance Company Limited','Tata Play Limited','Taj Air Limited','Infiniti Retail Limited','Tata Realty And Infrastructure Limited.','Tata Communications Transformation Services Limited','Tata Capital Limited','Tata Investment Corporation Limited','Tata Unistore Limited','Tata Capital Housing Finance Limited','Ewart Investments Limited','Tata Industries Limited','Tata Value Homes Limited','Mahaonline Limited','Kriday Realty Private Limited','Princeton Infrastructure Private Limited','Promont Hilltop Private Limited','Smart Value Homes (Peenya Project) Private Limited','Kolkata-One Excelton Private Limited','Hl Promoters Private Limited','Smart Value Homes (Boisar) Private Limited','Thdc Management Services Limited','Ardent Properties Private Limited','Tata Play Broadband Private Limited','TRIL Roads Private Limited','Impetis Biosciences Limited','Hampi Expressways Private Limited','Tril Urban Transport Private Limited','Tata Digital Private Limited','Tata Medical And Diagnostics Limited','TATA Business Hub Limited','Dharamshala Ropeway Limited','Tata Trustee Company Private Limited','Akashastha Technologies Private Limited','Tata Fintech Private Limited','Protraviny Private Limited','Tata Communications Collaboration Services Private Limited','Tata Pension Fund Management Private Limited','Agratas Energy Storage Solutions Private Limited','Tata Payments Limited','Real Stochastics Institute Of Data Private Limited','Simto Investment Co Ltd','Talakrit Foundation','Tcs Foundation','Mp Online Limited','Land Kart Builders Private Limited','Tata Autocomp Systems Limited','Tata Toyo Radiator Limited','Tata Autocomp Hendrickson Suspensions Private Limited','Pune It City Metro Rail Limited','Tata Autocomp Gotion Green Energy Solutions Private Limited','Taco EV Component Solutions Private Limited','Taco Punch Powertrain Private Limited','Solutions Infini Technologies(India) Private Limited','Supermarket Grocery Supplies Private Limited','Innovative Retail Concepts Private Limited','DailyNinja Delivery Services Private Limited','Savis Retail Private Limited','Tess Services Private Limited','Aurora Integrated Systems Private Limited','Tata Electronics Systems Solutions Private Limited','Uchit Expressways Private Limited','Calsea Footwear Private Limited','Tata Electronics Products And Solutions Private Limited','Infopark Properties Limited','Automotive Stampings And Assemblies Limited'];
+    const establishmentLocations = [
+      'Secunderabad (Mithona Towers)', 'Raviryala Village Maheshwaram', 'Hyderabad (Synergy Park)',
+      'Maheshwaram (Hardware Park)', 'Ibrahimpatnam', 'Hyderabad International Airport',
+      'Adibatla Aerospace SEZ', 'Hyderabad (Sai Geeta Ashram)', 'Bangalore (Whitefield)',
+      'Bangalore (Electronic City)', 'Bangalore (Cunningham Road)', 'New Delhi (Barakhamba Road)',
+      'Gurugram (Vatika One)', 'Gandhinagar (GIFT City)', 'Mumbai (Nariman Point)',
+      'Mumbai (Bandra Kurla Complex)', 'Mumbai (Lower Parel)', 'Mumbai (Fort)',
+      'Mumbai (Andheri East)', 'Pune (Hinjewadi)', 'Pune (Erandwane)', 'Kolar',
+      'Chennai (Mahindra World City)', 'Ranipet', 'Pantnagar'
+    ];
+    const establishmentRoot = document.querySelector('#establishment-tables');
+    for (let index = 0; index < 103; index++) {
+      const block = document.createElement('section');
+      block.className = 'establishment-block';
+      const location = establishmentLocations[index % establishmentLocations.length];
+      const subsidiaryName = subsidiaryNames[index] || `Subsidiary ${index + 1}`;
+      block.innerHTML = `<h3>${subsidiaryName}</h3><div class="table-wrap"></div>`;
+      const rows = [
+        { name: location, values: months.map((_, monthIndex) => Math.max(0, Math.round(180 + index * 11 + monthIndex * (index % 7 + 1) + Math.sin(monthIndex * .34 + index) * 32))) },
+        { name: 'Employees Joined', values: months.map((_, monthIndex) => Math.max(0, Math.round(12 + (monthIndex + index) % 16 + Math.sin(monthIndex + index) * 7))) },
+        { name: 'Attrition', values: months.map((_, monthIndex) => Math.max(0, Math.round(8 + (monthIndex * 2 + index) % 13 + Math.cos(monthIndex * .7 + index) * 6))) }
+      ];
+      const table = document.createElement('table');
+      table.innerHTML = `<thead><tr><th>Establishment Info</th>${months.map(month => `<th>${month}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr><td>${row.name}</td>${row.values.map(value => `<td>${format(value)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      block.querySelector('.table-wrap').appendChild(table);
+      establishmentRoot.appendChild(block);
+    }
+    const escapeCell = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+    const renderSourceTable = (table, rows) => {
+      table.innerHTML = `<thead>${rows.slice(0, 1).map(row => `<tr>${row.map(cell => `<th>${escapeCell(cell)}</th>`).join('')}</tr>`).join('')}</thead><tbody>${rows.slice(1).map(row => `<tr>${row.map(cell => `<td>${escapeCell(cell)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    };
+    fetch('tata-sons-authenticated-tables.json').then(response => response.json()).then(sourceTables => {
+      const renderedTables = [...document.querySelectorAll('table')];
+      sourceTables.forEach((sourceTable, index) => {
+        if (renderedTables[index]) renderSourceTable(renderedTables[index], sourceTable.rows);
+      });
+      const chart = window.Highcharts?.charts.find(Boolean);
+      if (chart && sourceTables[0]) {
+        const sourceRows = sourceTables[0].rows.slice(1).map(row => row.slice(1).map(value => { const parsed = Number(String(value).replace(/,/g, '')); return Number.isNaN(parsed) ? null : parsed; }));
+        chart.series[0].setData(sourceRows[0], false);
+        chart.series[1].setData(sourceRows[1], false);
+        chart.series[2].setData(sourceRows[2], false);
+        chart.redraw();
+      }
+    });
+    if (window.Highcharts) {
+      Highcharts.chart('chart', {
+        chart: { type: 'line', backgroundColor: 'transparent', spacing: [4, 0, 0, 0], marginLeft: 100, marginRight: 82, animation: { duration: 650 } },
+        title: { text: '' }, credits: { enabled: false },
+        xAxis: { categories: months, tickInterval: 3, labels: { rotation: -48, style: { color: '#6f757b', fontSize: '10px' } }, lineColor: '#e0e2e4', tickColor: '#e0e2e4' },
+        yAxis: [{ title: { text: 'Employee Count', style: { color: '#313a42', fontSize: '11px' } }, labels: { formatter: function () { return this.value >= 1000000 ? (this.value / 1000000).toFixed(2) + ' Mn' : (this.value / 1000).toFixed(0) + ' k'; }, style: { color: '#6f757b' } }, gridLineColor: '#e0e2e4', min: 0, max: 1000000, tickAmount: 5 }, { title: { text: 'Employees Joined & Attrition', style: { color: '#313a42', fontSize: '11px' } }, labels: { formatter: function () { return this.value >= 1000000 ? (this.value / 1000000).toFixed(2) + ' Mn' : (this.value / 1000).toFixed(0) + ' k'; }, style: { color: '#6f757b' } }, opposite: true, gridLineWidth: 0, min: 0, max: 480000, tickAmount: 5 }],
+        tooltip: { shared: true, valueDecimals: 0, valueSuffix: ' employees', backgroundColor: '#fff', borderColor: '#d5dadd', shadow: true },
+        legend: { align: 'center', verticalAlign: 'bottom', itemStyle: { color: '#59636c', fontWeight: '400' } },
+        plotOptions: { series: { animation: { duration: 1000 }, marker: { enabled: true, radius: 3 }, states: { hover: { lineWidthPlus: 1 } } } },
+        series: [{ name: 'Total Employee Count', data: employeeSeries, color: '#8abfe4', yAxis: 0, marker: { fillColor: '#4449bb', lineColor: '#4449bb', radius: 4 } }, { name: 'Employees Joined', data: joinedSeries, color: '#087b1c', yAxis: 1, marker: { symbol: 'diamond', radius: 4 } }, { name: 'Attrition', data: attritionSeries, color: '#ef1119', yAxis: 1, marker: { symbol: 'square', radius: 4 } }]
+      });
+    }
+  </script>
+</body>
+</html>
