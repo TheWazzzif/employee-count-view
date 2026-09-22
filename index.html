@@ -69,8 +69,10 @@
     .table-wrap { overflow-x: auto; border: 1px solid #d9dde0; scrollbar-color: #aeb5ba #f0f1f2; }
     table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
     th, td { min-width: 101px; height: auto; padding: 10px 12px; border-right: 1px solid #d9dde0; border-bottom: 1px solid #d9dde0; text-align: right; white-space: nowrap; }
-    th:first-child, td:first-child { width: 220px; max-width: 220px; min-width: 220px; text-align: left; position: sticky; left: 0; z-index: 2; background: inherit; }
+    th:first-child, td:first-child { width: 220px; max-width: 220px; min-width: 220px; text-align: left; position: sticky; left: 0; z-index: 2; background-clip: padding-box; }
     thead th { font-weight: 700; background: #f7f8f8; }
+    thead th:first-child { background: #f7f8f8; }
+    tbody td:first-child { background: #fff; }
     tbody tr:last-child td { padding-bottom: 9px; }
     tbody tr:hover td { background: #f3f6f8; }
     tbody tr:hover td:first-child { background: #f3f6f8; }
