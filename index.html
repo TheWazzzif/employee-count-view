@@ -88,6 +88,8 @@
     .chart-note { display: inline-flex; margin-top: 12px; padding: 6px 10px; border: 1px solid #e2e5e7; color: #75808a; background: #fafafa; }
     .chat { position: fixed; right: 20px; bottom: 18px; z-index: 30; width: 49px; height: 49px; border: 0; border-radius: 50%; color: #fff; background: var(--navy); box-shadow: 0 5px 17px rgba(0,0,0,.22); font-size: 20px; transition: transform .2s ease; }
     .chat:hover { transform: translateY(-3px); }
+    .fullscreen-button { position: fixed; top: 66px; right: 18px; z-index: 40; width: 34px; height: 34px; border: 1px solid #d8dce0; border-radius: 3px; color: #24313c; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.12); font-size: 16px; }
+    .fullscreen-button:hover { background: #f2f5f7; }
     @media (max-width: 900px) {
       .topnav { gap: 12px; }
       .topnav button:nth-child(n+3) { display: none; }
@@ -152,6 +154,7 @@
     </main>
   </div>
   <button class="chat" aria-label="Open support chat">▰</button>
+  <button class="fullscreen-button" id="fullscreen-button" aria-label="Enter fullscreen" title="Enter fullscreen">⛶</button>
   <script>
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const months = [];
@@ -168,6 +171,14 @@
     const joinedSeries = mergeThousands(joined, 8);
     const attritionSeries = mergeThousands(attrition, 9);
     const format = value => value.toLocaleString('en-US');
+    document.querySelector('#fullscreen-button').addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch {
+        window.open(window.location.href, '_blank');
+      }
+    });
     const makeTable = (target, rows) => {
       const table = document.createElement('table');
       table.innerHTML = `<thead><tr><th>Type</th>${months.map(month => `<th>${month}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr><td>${row.name}</td>${row.values.map(value => `<td>${format(value)}</td>`).join('')}</tr>`).join('')}</tbody>`;
